@@ -64,3 +64,7 @@ body{
 	  margin-right:10px;
 	  color:#ffffff;
   }
+.message_body{
+	width:100%;
+	margin-top:10px;
+}

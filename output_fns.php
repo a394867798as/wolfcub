@@ -26,7 +26,6 @@ function do_html_header($username,$title,$selected=""){
 ?>
 <html>
 <head>
-<meta charset="UTF-8">
 <title><?php echo $title; ?></title>
 <link href="css/css.css" rel="stylesheet" type="text/css" />
 </head>
@@ -69,9 +68,9 @@ function  display_toolbar($buttons){
 	foreach($buttons as $nav){
 		
 		if($nav == 'log-out'){
-			echo "<li style='float:roght;'><a href='index.php?action=".$nav."'>".ucfirst($nav)."</a></li>";
+			echo "<li style='float:roght;'><a href='index.php?action=".$nav."'>".$nav."</a></li>";
 		}else{
-			echo "<li><a href='index.php?action=".$nav."'>".ucfirst($nav)."</a></li>";
+			echo "<li><a href='index.php?action=".$nav."'>".$nav."</a></li>";
 		}
 	}
 	echo "</ul></div></div>";
@@ -206,13 +205,12 @@ function display_list($auth_user,$accountid){
 		
 		if($imap){
 			echo "<table width='".$table_width."' cellspacing='0' cellpadding='6' border='0'>";
-			$headers = imap_headers($imap);
+			$headers = imap_header($imap);
 			//we could reformat this date, or get other details using
 			//imap_fetchheaders, but this is not a bad summary so we
 			//just echo each
-		
 			$messages = sizeof($headers);
-			for($i=$messages-1;$i>0;$i--){
+			for($i=0;$i<$messages;$i++){
 				echo "<tr><td bgcolor='";
 				if($i%2==0){
 					echo "#ffffff";
@@ -220,56 +218,15 @@ function display_list($auth_user,$accountid){
 					echo "#ffffcc";
 				}
 				echo "'><a href='index.php?action=view-message&messageid=".($i+1)."'>";
-				echo ($headers[$i]);
+				echo $headers[$i];
 				echo "</a></td></tr>\n";
 		 	}
 			echo "</table>"; 
 		}else{
-			$account = get_account_settings($auth_user,$accountid);
-		
+			$account = get_account_settings($auth_user,$messages);
 			echo "<p style='padding-bottom:100px'>Could not open email box
 				  ".$account['server']."</p>";
 		}
 	}
-}
-function display_message($auth_user,$accountid,$messageid,$fullheaders='false'){
-	$messages = retrieve_message($auth_user, $accountid, $messageid,$fullheaders);
-	$message_menu = array('replay','replay-all','forward','delete','show-headers');
-	if(!$messages){
-		echo "Could not find the message information,Please try again.";
-	} else{
-?>
-	<table>
-	 <tr>
-	  <td width="20%" align="left">Subject:</td>
-	  <td width="50%" align="left">
-	  <?php
-	   echo  base64_imapdecode($messages['subject']);
-	   
-	   ?></td>
-	 </tr>
-	  <tr>
-	  <td width="20%" align="left">From:</td>
-	  <td width="50%" align="left"><?php  echo  base64_imapdecode($messages['fromaddress']); ?></td>
-	 </tr>
-	  <tr>
-	  <td width="20%" align="left">To:</td>
-	  <td width="50%" align="left"><?php  echo  base64_imapdecode($messages['toaddress']); ?></td>
-	 </tr>
-	  <tr>
-	  <td width="20%" align="left">CC:</td>
-	  <td width="50%" align="left"><?php echo $messages['ccaddress'] ?></td>
-	 </tr>
-	  <tr>
-	  <td width="20%" align="left">Received:</td>
-	  <td width="50%" align="left"><?php echo $messages['date'] ?></td>
-	 </tr>
-	</table>
-<?php 
-	}
-	display_toolbar($message_menu);
-	$preg = "/(Content-Type: text\/html; charset=\"utf-8\" Content-Transfer-Encoding: base64)+(.*)[-{2}] /i";
-	
-	echo "<div class='message_body'>".decode_qprint($messages['body'])."</div>";
 }
 ?>

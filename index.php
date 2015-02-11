@@ -87,7 +87,7 @@
  	do_html_header($_SESSION['auth_user'],"Warm Mail - ".format_action($action),$_SESSION['selected_account']);
  	
  }else{
- 	do_html_header(@$_SESSION['auth_user'],"Warm Mail",@$_SESSION['selected_account']);
+ 	do_html_header(@$_SESSION['auth_user'],"Warm Mail",$_SESSION['selected_account']);
  }
  display_toolbar($buttons);
  //*************************************************************************************

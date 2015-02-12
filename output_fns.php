@@ -220,7 +220,7 @@ function display_list($auth_user,$accountid){
 					echo "#ffffcc";
 				}
 				echo "'><a href='index.php?action=view-message&messageid=".($i+1)."'>";
-				echo ($headers[$i]);
+				echo base64replace($headers[$i]);
 				echo "</a></td></tr>\n";
 		 	}
 			echo "</table>"; 

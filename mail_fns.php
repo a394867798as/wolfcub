@@ -163,11 +163,68 @@ function decode_qprint($str){
 			
 	}
 				$str = (preg_replace("/=/","",$str));
-				$str = preg_replace("/style\"/","style=\"",$str);
-				$str = preg_replace("/a\"/","a=\"",$str);
+				$str_array = array("style","href","src","alt","height","width");
+				foreach ($str_array as $value){
+					$str = preg_replace("/".$value."\"/",$value."=\"",$str);
+				}
+				
+				$str = preg_replace("/href\"/","href=\"",$str);
 				//替换空格键（\n\r\t）
 				$str = preg_replace("/[\n\r]/","",$str);
 				preg_match("/charset\"(\w*)\"/",$str,$regs);
+				$str = safeEncoding(urldecode($str));
 				
-				return urldecode($str);}
+				return ($str);
+}
+function safeEncoding($string,$outEncoding ='UTF-8')    
+    {    
+        $encoding = "GBK";    
+        for($i=0;$i<strlen($string);$i++)    
+        {    
+            if(ord($string{$i})<128)    
+                  continue;    
+            
+            if((ord($string{$i})&224)==224)    
+            {    
+                  //第一个字节判断通过    
+                 $char = $string{++$i};    
+                  if((ord($char)&128)==128)    
+                 {    
+                       //第二个字节判断通过    
+                     $char = $string{++$i};    
+                    if((ord($char)&128)==128)    
+                     {    
+                          $encoding = "UTF-8";    
+                          break;    
+                     }    
+                   }    
+             }    
+        
+            if((ord($string{$i})&192)==192)    
+              {    
+                  //第一个字节判断通过    
+                 $char = $string{++$i};    
+                if((ord($char)&128)==128)    
+                  {    
+                      // 第二个字节判断通过    
+                       $encoding = "GB2312";    
+                    break;    
+                }    
+             }    
+        }    
+                 
+        if(strtoupper($encoding) == strtoupper($outEncoding))    
+            return $string;    
+        else   
+               return iconv($encoding,$outEncoding,$string);    
+    }
+  function base64replace($string){
+  	$utf8_base64 ="=\?utf-8\?b\?" ;
+  	preg_match_all ("/.*".$utf8_base64."(.*)".$utf8_base64."(.*)\(/i",$string,$regs);
+  	
+  	$string = preg_replace("/=\?utf-8\?b\?/i","",$string);
+  	$string = preg_replace("/".$regs[1][0]."/",base64_decode($regs[1][0]),$string);
+  	$string = preg_replace("/".$regs[2][0]."/",base64_decode($regs[2][0]),$string);
+  	return $string;
+  }
 ?>
